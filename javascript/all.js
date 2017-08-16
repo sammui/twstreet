@@ -101,8 +101,6 @@ $(document).ready(function()
     createImage(template,source,x,y,w,h);
   });
 
-  myfiles = [{name:"sample.png", type:"image/png"}];
-  loadImage(myfiles);
 });
 $(window).konami({
   code : [55,55,55],
