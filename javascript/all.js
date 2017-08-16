@@ -100,6 +100,8 @@ $(document).ready(function()
     y = position[1]/scale;
     createImage(template,source,x,y,w,h);
   });
+
+  loadImage(input.files)
 });
 $(window).konami({
   code : [55,55,55],
