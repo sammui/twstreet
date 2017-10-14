@@ -158,7 +158,7 @@ a:hover {
   .wuowuo_shop {
     position: absolute;
     right: 5%;
-    top: 0px;
+    top: -10px;
     z-index: 1000;
   }
 }
