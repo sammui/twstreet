@@ -76,13 +76,14 @@ body {
   font-size: 16px;
   line-height: 24px;
   padding: 0px 0px 10px 0px;
+  color: black;
 }
 
 /* line 16, ../sass/core/_global.scss */
 a {
-  color: white;
+  color: black;
   text-decoration: none;
-  border-bottom: 1px solid white;
+  border-bottom: 1px solid black;
 }
 /* line 24, ../../../../../../Applications/Fire.app/Contents/Resources/lib/ruby/compass_0.12/compass-0.12.2/frameworks/compass/stylesheets/compass/typography/links/_link-colors.scss */
 a:hover {
@@ -827,8 +828,8 @@ input#uploadInput {
   margin: 0;
   border: none;
   background-color: transparent;
-  color: white;
-  border-bottom: 2px solid white;
+  color: black;
+  border-bottom: 2px solid black;
   font-size: 24px;
   font-weight: normal;
   line-height: 1.3;
