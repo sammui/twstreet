@@ -9,9 +9,11 @@ $uploading = $('#uploading');
 $(window).load(function()
 {
   var
-  container_size = $userimage.width(),
+  container_size = [$userimage.width(), $userimage.height()];
   userimage_size = getImgSize(getBackgroundImage($userimage));
   resizeDragger(userimage_size,container_size);
+  var radiobtn = document.getElementById("template1");
+  radiobtn.checked = true;  
 });
 $(document).ready(function()
 {
@@ -38,7 +40,7 @@ $(document).ready(function()
   // size slider
   $sizer.slider({
     value: 100,
-    max: 170,
+    max: 180,
     min: 30,
     slide: function(event, ui) {
       var
@@ -47,18 +49,20 @@ $(document).ready(function()
       center = getBackgroundCenterPoint(truesize,position);
       $('<img/>').attr('src',getBackgroundImage($userimage))
       .load(function() {
+        var pos = $dragger.position();
         var
-        size = [this.width,this.height],
+        container_size = [$userimage.width(), $userimage.height()];
+        userimage_size = getImgSize(getBackgroundImage($userimage));
+        resizeDragger(userimage_size,container_size);
+        size = getScaledImageSize(userimage_size, container_size),
         width = size[0]*(ui.value)/100,
-        height = size[1]*(ui.value)/100,
-        left = center[0] - width*0.5,
-        top = center[1] - height*0.5;
+        height = size[1]*(ui.value)/100;     
         $dragger
           .css('width',width+'px').css('height',height+'px')
-          .css('top',top+'px').css('left',left+'px');
+          .css('top',pos.top+'px').css('left',pos.left+'px');
         $userimage
           .css('background-size',width+'px '+height+'px')
-          .css('background-position',left+'px '+top+'px');
+          .css('background-position',pos.left+'px '+pos.top+'px');
       });
 
     }
@@ -79,7 +83,7 @@ $(document).ready(function()
     .load(function() {
       var
       size = [this.width,this.height],
-      container_size = $userimage.width();
+      container_size = [$userimage.width(),$userimage.height()];
       resizeDragger(size,container_size,value);
     });
   });
@@ -89,16 +93,16 @@ $(document).ready(function()
     basesize = $userimage.width(),
     size = getBackgroundSize($userimage.css('background-size')),
     position = getBackgroundPosition($userimage.css('background-position')),
-    scale = basesize/500;
+    scale = 4;
 
     var
     template = $('input[name=template]:checked').val(),
     source = $('#source').val(),
-    w = size[0]/scale,
-    h = size[1]/scale,
-    x = position[0]/scale,
-    y = position[1]/scale;
-    createImage(template,source,x,y,w,h);
+    w = $dragger.width()*3,
+    h = $dragger.height()*3,
+    x = $dragger.position().left*3,
+    y = $dragger.position().top*3;
+    createImage(template,source,3);
   });
 
 });
@@ -121,7 +125,7 @@ $(window).konami({
   }
 });
 
-function createImage(template,source,x,y,w,h){
+function createImage(template,source,scale){
   var cover = new Image();
   cover.src = 'images/object/'+template+'.png';
 
@@ -129,15 +133,15 @@ function createImage(template,source,x,y,w,h){
   userimage.src = source;
 
   var resize_canvas = document.getElementById("result");
-  resize_canvas.width = 500;
-  resize_canvas.height = 500;
+  resize_canvas.width = $coverimage.width()*scale;
+  resize_canvas.height = $coverimage.height()*scale;
 
   var ctx = resize_canvas.getContext("2d");
-  ctx.rect(0,0,500,500);
+  ctx.rect(0,0,$coverimage.width()*scale,$coverimage.height()*scale);
   ctx.fillStyle="#CCCCCC";
   ctx.fill();
-  ctx.drawImage(userimage,x,y,w,h);
-  ctx.drawImage(cover,0,0,500,500);
+  ctx.drawImage(userimage,$dragger.position().left*scale, $dragger.position().top*scale, $dragger.width()*scale,$dragger.height()*scale);
+  ctx.drawImage(cover,0,0,$coverimage.width()*scale,$coverimage.height()*scale);
 
   var base64 = resize_canvas.toDataURL("image/png");
 
@@ -160,6 +164,7 @@ function createImage(template,source,x,y,w,h){
 
 //uploader
 $(function(){
+
   var dropZone = document.getElementById('drop');
   dropZone.addEventListener('dragover', handleDragOver, false);
   dropZone.addEventListener('drop', handleFileSelect, false);
@@ -170,6 +175,9 @@ $(function(){
   $('#uploadInput').on('change',function(){
     input = document.getElementById('uploadInput');
     loadImage(input.files);
+    container_size = [$userimage.width(),$userimage.height()];
+    userimage_size = [this.width,this.height];
+    resizeDragger(userimage_size,container_size,value);    
   });
 });
 
@@ -212,6 +220,16 @@ function loadImage(files) {
     ctx.drawImage(img, 0, 0);
     var base64 = canvas.toDataURL("image/png");
 
+/* manual generated base64
+    img = new Image();
+    img.src = ".....(please fill in)....."
+    var canvas = document.getElementById("canvas")
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    var base64 = canvas.toDataURL("image/png");
+*/
     $('#source').attr('value',base64);
     $userimage.css('background-image','url('+base64+')');
 
@@ -236,7 +254,7 @@ function loadImage(files) {
     .load(function() {
       var
       value = $('input[name=template]:checked').val(),
-      container_size = $userimage.width(),
+      container_size = [$userimage.width(),$userimage.height()];
       userimage_size = [this.width,this.height];
       resizeDragger(userimage_size,container_size,value);
 
@@ -256,24 +274,35 @@ function getBackgroundImage(element)
   var url = element.css('background-image');
   return url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
 }
-function resizeDragger(size,wrapper,value,upload)
+function getScaledImageSize(size, wrapperSize) {
+  var scale, width, height;
+  if(size[0] >= size[1]) {
+    scale = (wrapperSize[1]/size[1]);
+    width = size[0]*scale;
+    height = size[1]*scale;
+  }
+  else {
+    scale = (wrapperSize[0]/size[0]);
+    width = size[0]*scale;
+    height = size[1]*scale;
+  }
+  return [width,height];
+}
+function resizeDragger(size,wrapperSize,value,upload)
 {
   value = typeof value !== 'undefined' ? value : 1;
   upload = typeof upload !== 'undefined' ? upload : 0;
 
+  var wrapper = wrapperSize[0];
   var scale, width, height, top, left;
-  if(size[0] > size[1]) {
-    scale = (wrapper/size[1]);
-    width = size[0]*scale;
-    height = wrapper;
+  width = getScaledImageSize(size, wrapperSize)[0];
+  height = getScaledImageSize(size, wrapperSize)[1];
+  if(size[0] >= size[1]) {
     top = 0;
     left = (width - wrapper)*0.5*-1;
   }
   else {
-    scale = (wrapper/size[0]);
-    width = wrapper;
-    height = size[1]*scale;
-    top = (height - wrapper)*0.5*-1;
+    top = (height - wrapperSize[1])*-1;
     left = 0;
   }
 
