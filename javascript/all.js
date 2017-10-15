@@ -12,9 +12,28 @@ $(window).load(function()
   container_size = [$userimage.width(), $userimage.height()];
   userimage_size = getImgSize(getBackgroundImage($userimage));
   resizeDragger(userimage_size,container_size);
+
   var radiobtn = document.getElementById("template1");
-  radiobtn.checked = true;  
+  radiobtn.checked = true;
+
+  initImage("images/wuo_sample.png");
 });
+
+function initImage(source) {
+  var img = new Image();
+  img.src = source;
+
+  var canvas = document.getElementById("canvas");
+  var ctx = canvas.getContext("2d");
+  canvas.width = 1024;
+  canvas.height = canvas.width * (img.height / img.width);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+  var base64 = canvas.toDataURL("image/png");
+  $('#source').attr('value',base64);
+  $('#loadimage').attr('src',base64);
+}
+
 $(document).ready(function()
 {
   // ie alert
@@ -84,7 +103,7 @@ $(document).ready(function()
       var
       size = [this.width,this.height],
       container_size = [$userimage.width(),$userimage.height()];
-      resizeDragger(size,container_size,value);
+      //resizeDragger(size,container_size,value);
     });
   });
 
@@ -214,10 +233,15 @@ function loadImage(files) {
   }
   function imageLoaded() {
     var canvas = document.getElementById("canvas")
-    canvas.width = img.width;
-    canvas.height = img.height;
+
     var ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
+    //canvas.width = img.width;
+    //canvas.height = img.height;
+    canvas.width = 1024;
+    canvas.height = canvas.width * (img.height / img.width);
+
+
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     var base64 = canvas.toDataURL("image/png");
 
 /* manual generated base64
