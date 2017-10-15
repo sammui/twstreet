@@ -195,8 +195,9 @@ $(function(){
     input = document.getElementById('uploadInput');
     loadImage(input.files);
     container_size = [$userimage.width(),$userimage.height()];
-    userimage_size = [this.width,this.height];
-    resizeDragger(userimage_size,container_size,value);    
+    userimage_size = getImgSize(getBackgroundImage($userimage));
+    //userimage_size = [this.width,this.height];
+    //resizeDragger(userimage_size,container_size,value);    
   });
 });
 
