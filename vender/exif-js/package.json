@@ -1,0 +1,71 @@
+{
+  "name": "exif-js",
+  "version": "2.3.0",
+  "description": "JavaScript library for reading EXIF image metadata",
+  "main": "exif.js",
+  "directories": {
+    "example": "example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/exif-js/exif-js.git"
+  },
+  "keywords": [
+    "exif"
+  ],
+  "author": {
+    "name": "Jacob Seidelin"
+  },
+  "maintainers": [
+    {
+      "email": "bartvanderwal@gmail.com",
+      "name": "bartvanderwal"
+    },
+    {
+      "email": "info@webthusiast.nl",
+      "name": "webthusiast"
+    },
+    {
+      "email": "jseidelin@nihilogic.dk",
+      "name": "jseidelin"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/exif-js/exif-js/issues"
+  },
+  "homepage": "https://github.com/exif-js/exif-js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "spec",
+    "example"
+  ],
+  "devDependencies": {
+    "bower": "^1.4.2",
+    "mversion": "^1.10.0"
+  },
+  "gitHead": "a10f3d53f3f72defef4cad5a54a90ee308901fe6",
+  "_id": "exif-js@2.3.0",
+  "scripts": {},
+  "_shasum": "9d10819bf571f873813e7640241255ab9ce1a814",
+  "_from": "exif-js@*",
+  "_npmVersion": "3.10.10",
+  "_nodeVersion": "6.11.0",
+  "_npmUser": {
+    "name": "bartvanderwal",
+    "email": "bartvanderwal@gmail.com"
+  },
+  "dist": {
+    "shasum": "9d10819bf571f873813e7640241255ab9ce1a814",
+    "tarball": "https://registry.npmjs.org/exif-js/-/exif-js-2.3.0.tgz"
+  },
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/exif-js-2.3.0.tgz_1505076117284_0.5361941244918853"
+  },
+  "_resolved": "https://registry.npmjs.org/exif-js/-/exif-js-2.3.0.tgz"
+}

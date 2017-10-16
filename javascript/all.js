@@ -181,6 +181,34 @@ function createImage(template,source,scale){
   }
 }
 
+function getOrientation(file, callback) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+
+    var view = new DataView(e.target.result);
+    if (view.getUint16(0, false) != 0xFFD8) return callback(-2);
+    var length = view.byteLength, offset = 2;
+    while (offset < length) {
+      var marker = view.getUint16(offset, false);
+      offset += 2;
+      if (marker == 0xFFE1) {
+        if (view.getUint32(offset += 2, false) != 0x45786966) return callback(-1);
+        var little = view.getUint16(offset += 6, false) == 0x4949;
+        offset += view.getUint32(offset + 4, little);
+        var tags = view.getUint16(offset, little);
+        offset += 2;
+        for (var i = 0; i < tags; i++)
+          if (view.getUint16(offset + (i * 12), little) == 0x0112)
+            return callback(view.getUint16(offset + (i * 12) + 8, little));
+      }
+      else if ((marker & 0xFF00) != 0xFF00) break;
+      else offset += view.getUint16(offset, false);
+    }
+    return callback(-1);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
 //uploader
 $(function(){
 
@@ -232,59 +260,68 @@ function loadImage(files) {
     img.onload = imageLoaded;
     img.src = fr.result;
   }
+  function newCanvasSize(w, h, rotation) {
+      var rads = rotation * Math.PI / 180;
+      var c = Math.cos(rads);
+      var s = Math.sin(rads);
+      if (s < 0) {
+          s = -s;
+      }
+      if (c < 0) {
+          c = -c;
+      }
+      return [h * s + w * c,h * c + w * s];
+  }
   function imageLoaded() {
-    var canvas = document.getElementById("canvas")
 
-    var ctx = canvas.getContext("2d");
-    //canvas.width = img.width;
-    //canvas.height = img.height;
-    canvas.width = 1024;
-    canvas.height = canvas.width * (img.height / img.width);
+    
+    getOrientation(file, function(orientation) {
+        console.log('orientation: ' + orientation);
+
+        var canvas = document.getElementById("canvas")
+        var ctx = canvas.getContext("2d");
+        var oriWidth = 1024;
+        var oriHeight = oriWidth * (img.height / img.width);
+        var degrees = 0;
+        if (orientation == 6) {
+          console.log('rotate 90degree');
+          degrees = 90;
+        } else if (orientation == 3) {
+          console.log('rotate 180degree');
+          degrees = 180;          
+        } else if (orientation == 8) {
+          console.log('rotate 180degree');
+          degrees = 270;           
+        }
+        var newSize = newCanvasSize(canvas.width, canvas.height, degrees);
+        canvas.width = newSize[0];
+        canvas.height = newSize[1];
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.save();
+        ctx.translate(canvas.width/2,canvas.height/2);
+        ctx.rotate(degrees*Math.PI/180);         
+        ctx.drawImage(img, -oriWidth/2, -oriHeight/2, oriWidth, oriHeight);
+        ctx.restore();
 
 
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    var base64 = canvas.toDataURL("image/png");
+        var base64 = canvas.toDataURL("image/png");
+        $('#source').attr('value',base64);
+        $userimage.css('background-image','url('+base64+')');
 
-/* manual generated base64
-    img = new Image();
-    img.src = ".....(please fill in)....."
-    var canvas = document.getElementById("canvas")
-    canvas.width = img.width;
-    canvas.height = img.height;
-    var ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-    var base64 = canvas.toDataURL("image/png");
-*/
-    $('#source').attr('value',base64);
-    $userimage.css('background-image','url('+base64+')');
+        $('<img/>').attr('src',base64)
+        .load(function() {
+          var
+          value = $('input[name=template]:checked').val(),
+          container_size = [$userimage.width(),$userimage.height()];
+          userimage_size = [this.width,this.height];
+          resizeDragger(userimage_size,container_size,value);
 
-    var thumb = document.getElementById("thumb");
-    var thumb_w,thumb_h;
-    if(img.width > img.height) {
-      thumb_h = 100;
-      thumb_w = 100*(img.width/img.height);
-    }
-    else {
-      thumb_w = 100;
-      thumb_h = 100*(img.height/img.width);
-    }
-    thumb.width = thumb_w;
-    thumb.height = thumb_h;
-    var ctx = thumb.getContext("2d");
-    ctx.drawImage(img,0,0,thumb_w,thumb_h);
-    var thumbbase64 = thumb.toDataURL("image/png");
-    $('#templates label').css('background-image','url('+thumbbase64+')');
+          $loading.hide();
+          $uploading.fadeOut();
+        });
 
-    $('<img/>').attr('src',base64)
-    .load(function() {
-      var
-      value = $('input[name=template]:checked').val(),
-      container_size = [$userimage.width(),$userimage.height()];
-      userimage_size = [this.width,this.height];
-      resizeDragger(userimage_size,container_size,value);
 
-      $loading.hide();
-      $uploading.fadeOut();
+
     });
   }
 }
@@ -301,15 +338,20 @@ function getBackgroundImage(element)
 }
 function getScaledImageSize(size, wrapperSize) {
   var scale, width, height;
-  if(size[0] >= size[1]) {
+  if (size[0] >= size[1]) {
     scale = (wrapperSize[1]/size[1]);
     width = size[0]*scale;
     height = size[1]*scale;
-  }
-  else {
-    scale = (wrapperSize[0]/size[0]);
-    width = size[0]*scale;
-    height = size[1]*scale;
+  } else {
+    if (size[0]*1.0/size[1] < wrapperSize[0]*1.0/wrapperSize[1]) {
+      scale = (wrapperSize[1]/size[1]);
+      height = size[1]*scale;
+      width = size[0]*scale;
+    } else {
+      scale = (wrapperSize[0]/size[0]);
+      width = size[0]*scale;
+      height = size[1]*scale;    
+    }
   }
   return [width,height];
 }
