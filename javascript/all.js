@@ -11,13 +11,22 @@ $(window).load(function()
   var
   container_size = [$userimage.width(), $userimage.height()];
   userimage_size = getImgSize(getBackgroundImage($userimage));
-  resizeDragger(userimage_size,container_size);
-
+  initDragger();
+  //resizeDragger(userimage_size,container_size);
   var radiobtn = document.getElementById("template1");
   radiobtn.checked = true;
 
   initImage("images/wuo_sample.png");
 });
+
+function initDragger() {
+  $dragger
+    .css('width','259px').css('height','194')
+    .css('top','83px').css('left','-27px');
+  $userimage
+    .css('background-size','259px 194px')
+    .css('background-position','-27px 83px');
+}
 
 function initImage(source) {
   var img = new Image();
