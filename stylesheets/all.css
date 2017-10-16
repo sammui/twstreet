@@ -161,6 +161,11 @@ a:hover {
     top: -10px;
     z-index: 1000;
   }
+
+  #copyright {
+    width: 35%;
+    margin: 0 auto;
+  }
 }
 
 .wuowuo_link {
