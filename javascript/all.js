@@ -97,14 +97,6 @@ $(document).ready(function()
     $coverimage.css('background-image','url('+url+')');
     if($userimage.hasClass('dragged') == true) $userimage.attr('class', 'inner dragged');
     else $userimage.attr('class', 'inner');
-
-    $('<img/>').attr('src',getBackgroundImage($userimage))
-    .load(function() {
-      var
-      size = [this.width,this.height],
-      container_size = [$userimage.width(),$userimage.height()];
-      //resizeDragger(size,container_size,value);
-    });
   });
 
   $("#normalSubmit").click(function() {
@@ -221,11 +213,7 @@ $(function(){
   });
   $('#uploadInput').on('change',function(){
     input = document.getElementById('uploadInput');
-    loadImage(input.files);
-    container_size = [$userimage.width(),$userimage.height()];
-    userimage_size = getImgSize(getBackgroundImage($userimage));
-    //userimage_size = [this.width,this.height];
-    //resizeDragger(userimage_size,container_size,value);    
+    loadImage(input.files);   
   });
 });
 
@@ -273,8 +261,6 @@ function loadImage(files) {
       return [h * s + w * c,h * c + w * s];
   }
   function imageLoaded() {
-
-    
     getOrientation(file, function(orientation) {
         console.log('orientation: ' + orientation);
 
