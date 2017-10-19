@@ -147,6 +147,10 @@ a:hover {
   width: 100px;
 }
 
+.fa-hand-o-right {
+  margin-right: 5px;
+}
+
 .wuowuo_shop {
   position: absolute;
   right: 5%;
