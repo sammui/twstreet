@@ -275,8 +275,12 @@ function loadImage(files) {
 
         var canvas = document.getElementById("canvas")
         var ctx = canvas.getContext("2d");
-        var oriWidth = 1024;
-        var oriHeight = oriWidth * (img.height / img.width);
+        var oriWidth = img.width;
+        var oriHeight = img.height;
+        if (img.width > 2048) {
+          oriWidth = 2048;
+          oriHeight = oriWidth * (img.height / img.width);
+        }
         var degrees = 0;
         if (orientation == 6) {
           console.log('rotate 90degree');
@@ -288,7 +292,7 @@ function loadImage(files) {
           console.log('rotate 180degree');
           degrees = 270;           
         }
-        var newSize = newCanvasSize(canvas.width, canvas.height, degrees);
+        var newSize = newCanvasSize(oriWidth, oriHeight, degrees);
         canvas.width = newSize[0];
         canvas.height = newSize[1];
         ctx.clearRect(0,0,canvas.width,canvas.height);
