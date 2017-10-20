@@ -277,8 +277,8 @@ function loadImage(files) {
         var ctx = canvas.getContext("2d");
         var oriWidth = img.width;
         var oriHeight = img.height;
-        if (img.width > 2048) {
-          oriWidth = 2048;
+        if (img.width > 1024) {
+          oriWidth = 1024;
           oriHeight = oriWidth * (img.height / img.width);
         }
         var degrees = 0;
